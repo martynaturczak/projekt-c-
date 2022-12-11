@@ -36,7 +36,6 @@ int main ()
     float gravity = 0.05;
     bool on_ground = 1;
     int column = 64;
-    int playagain = 0;
     int points = 0;
 
     const int level[] =
