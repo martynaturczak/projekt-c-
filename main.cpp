@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include "map.h"
 #include "menu.h"
+#include "gameover.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ int main ()
     float gravity = 0.05;
     bool on_ground = 1;
     int column = 64;
+    int playagain = 0;
     int points = 0;
 
     const int level[] =
@@ -42,11 +44,11 @@ int main ()
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 3, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
     int level2[] =
     {
@@ -56,7 +58,18 @@ int main ()
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    };
+    int level3[] =
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
     const int menu_background[] =
@@ -73,14 +86,16 @@ int main ()
 
     TileMap map;
     TileMap coin;
+    TileMap enemy;
     TileMap menu_bg;
     if (!map.load("set.png", sf::Vector2u(32, 32), level, column, 8))
         return -0;
     if (!coin.load("set2.png", sf::Vector2u(32, 32), level2, column, 8))
         return -1;
+    if (!enemy.load("set3.png", sf::Vector2u(32, 32), level3, column, 8))
+        return -1;
     if (!menu_bg.load("background.png", sf::Vector2u(32, 32), menu_background, 16, 8))
         return -1;
-
     while (menu_window.isOpen())
     {
         sf::Event event1;
@@ -191,11 +206,7 @@ int main ()
                                 {
                                     velocityY = 0;
                                     on_ground = 1; 
-                                }
-                                position.x += velocityX;
-                                position.y += velocityY;
-                                view.move(velocityX, 0);
-                                
+                                } 
                                 if (level2[(int)((position.y + 16 )/32) * column  + (int)((position.x + 16)/32)] == 1)
                                 {
                                     level2[(int)((position.y + 16)/32) * column + (int)((position.x + 16)/32)] = 0;
@@ -203,6 +214,44 @@ int main ()
                                     if (!coin.load("set2.png", sf::Vector2u(32, 32), level2, column, 8))
                                         return -1;
                                 }
+                                if (level[(int)((position.y + 40)/32) * column + (int)((position.x)/32)] == 3)
+                                {
+                                    window.close();
+                                }
+                                //enemy
+                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x)/32)] == 1)
+                                {
+                                    level3[(int)((position.y + 32)/32) * column + (int)((position.x)/32)] = 0;
+                                    if (!enemy.load("set3.png", sf::Vector2u(32, 32), level3, column, 8))
+                                        return -1;
+                                }
+                                if (level3[(int)(position.y/32) * column + (int)((position.x + 32 + velocityX)/32)] == 1)
+                                {
+                                    velocityX = 0;
+                                    if (points > 0)
+                                        points--;
+                                }
+                                if (level3[(int)(position.y/32) * column + (int)((position.x + velocityX)/32)] == 1)
+                                {
+                                    velocityX = 0;
+                                    if (points > 0)
+                                        points--;
+                                }
+                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x + 32 + velocityX)/32)] == 1)
+                                {
+                                    velocityX = 0;
+                                    if (points > 0)
+                                        points--;
+                                }
+                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x + velocityX)/32)] == 1)
+                                {
+                                    velocityX = 0;
+                                    if (points > 0)
+                                        points--;
+                                }
+                                position.x += velocityX;
+                                position.y += velocityY;
+                                view.move(velocityX, 0);
                             }
                             ranking.close();
                             menu_window.close();
@@ -211,6 +260,7 @@ int main ()
                             sprite.setPosition(position.x, position.y);
                             window.draw(map);
                             window.draw(coin);
+                            window.draw(enemy);
                             window.draw(sprite);
                             text.setPosition(position.x, 0);
                             window.draw(text);
@@ -244,4 +294,65 @@ int main ()
     menu.draw(menu_window);
     menu_window.display();
     }
+    sf::RenderWindow gameover_window(sf::VideoMode(512, 256), "GameOver");
+    GameOver game_over(gameover_window.getSize().x,gameover_window.getSize().y);
+    while (gameover_window.isOpen())
+    {
+        sf::Event event3;
+        while (gameover_window.pollEvent(event3))
+        {
+            text.setString(std::to_string(points));
+            text.setFillColor(sf::Color::Yellow);    
+            text.setFont(font);  
+            text.setPosition(280,100);  
+            text.setCharacterSize(25);
+            text.setStyle(sf::Text::Italic);
+            if (event3.type == sf::Event::Closed)
+                gameover_window.close();
+            if (event3.type == sf::Event::KeyReleased)
+            {
+                if (event3.key.code == sf::Keyboard::Up)
+                {
+                    game_over.MoveUp();
+                    break;
+                }
+                if (event3.key.code == sf::Keyboard::Down)
+                {
+                    game_over.MoveDown();
+                    break;
+                }
+                if (event3.key.code == sf::Keyboard::Return)
+                {
+                    int x1 = game_over.GameOverPressed();
+                    if (x1 == 0)
+                    {
+                        gameover_window.close();
+                        while (ranking.isOpen())
+                        {
+                            sf::Event event2;
+                            while (ranking.pollEvent(event2))
+                            {
+                                if (event2.type == sf::Event::Closed)
+                                    ranking.close();
+                            }
+                        menu_window.close(); 
+                        window.close();
+                        ranking.clear();
+                        ranking.display();
+                        }
+                    }
+                    if (x1 == 1)
+                        gameover_window.close();
+                    break;
+                }
+            }       
+        }
+    gameover_window.clear();
+    gameover_window.draw(menu_bg);
+    game_over.draw(gameover_window);
+    gameover_window.draw(text);
+    gameover_window.display();
+    }
 }
+
+
