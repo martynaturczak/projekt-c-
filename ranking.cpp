@@ -8,42 +8,42 @@ Ranking::Ranking(float width, float height)
     ranking[0].setFillColor(sf::Color::Yellow);
     ranking[0].setFont(font);
     ranking[0].setPosition(10, 20);
-    ranking[0].setCharacterSize(13);
+    ranking[0].setCharacterSize(50);
 
     ranking[1].setString("EXIT");
     ranking[1].setFillColor(sf::Color::White);
     ranking[1].setFont(font);
-    ranking[1].setPosition(10, 40);
-    ranking[1].setCharacterSize(13);
+    ranking[1].setPosition(10, 90);
+    ranking[1].setCharacterSize(50);
 
     ranking_selected = 0;
 
     text2.setString("RANKING");
     text2.setFillColor(sf::Color::Yellow);
     text2.setFont(font);  
-    text2.setPosition(180,50);    
-    text2.setCharacterSize(30);
+    text2.setPosition(700,200);    
+    text2.setCharacterSize(150);
     text2.setStyle(sf::Text::Italic);
 
     text3.setString("1.");
     text3.setFillColor(sf::Color::Yellow);    
     text3.setFont(font);  
-    text3.setPosition(150,90);  
-    text3.setCharacterSize(30);
+    text3.setPosition(720,400);  
+    text3.setCharacterSize(100);
     text3.setStyle(sf::Text::Italic);
 
     text4.setString("2. ");
     text4.setFillColor(sf::Color::Yellow);    
     text4.setFont(font);  
-    text4.setPosition(150,130);  
-    text4.setCharacterSize(30);
+    text4.setPosition(720,550);  
+    text4.setCharacterSize(100);
     text4.setStyle(sf::Text::Italic);
 
     text5.setString("3. ");
     text5.setFillColor(sf::Color::Yellow);    
     text5.setFont(font);  
-    text5.setPosition(150,170);  
-    text5.setCharacterSize(30);
+    text5.setPosition(720,700);  
+    text5.setCharacterSize(100);
     text5.setStyle(sf::Text::Italic);
     
 }

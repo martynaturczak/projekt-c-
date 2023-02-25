@@ -1,8 +1,8 @@
-Ola
-1
-Karolina
+gracz1
+36
+gracz2
+12
+gracz3
+17
+player
 2
-Ewa
-3
-Agata
-5

@@ -7,41 +7,41 @@ Menu::Menu(float width, float height)
     menu[0].setString("START GAME");
     menu[0].setFillColor(sf::Color::White);
     menu[0].setFont(font);
-    menu[0].setPosition(200, 130);
-    menu[0].setCharacterSize(13);
+    menu[0].setPosition(1100, 400);
+    menu[0].setCharacterSize(70);
 
     menu[1].setString("RANKING");
     menu[1].setFillColor(sf::Color::White);
     menu[1].setFont(font);
-    menu[1].setPosition(200, 150);
-    menu[1].setCharacterSize(13);
+    menu[1].setPosition(1100, 500);
+    menu[1].setCharacterSize(70);
 
     menu[2].setString("EXIT");
     menu[2].setFillColor(sf::Color::White);
     menu[2].setFont(font);
-    menu[2].setPosition(200, 170);
-    menu[2].setCharacterSize(13);
+    menu[2].setPosition(1100, 600);
+    menu[2].setCharacterSize(70);
     menu_selected = 0;
 
     text2.setString("ON");
     text2.setFillColor(sf::Color::Yellow);
     text2.setFont(font);  
-    text2.setPosition(35,120);    
-    text2.setCharacterSize(19);
+    text2.setPosition(100,350);    
+    text2.setCharacterSize(117);
     text2.setStyle(sf::Text::Italic);
 
     text3.setString("THE OTHER");
     text3.setFillColor(sf::Color::Yellow);    
     text3.setFont(font);  
-    text3.setPosition(35,142);  
-    text3.setCharacterSize(25);
+    text3.setPosition(100,450);  
+    text3.setCharacterSize(150);
     text3.setStyle(sf::Text::Italic);
     
     text4.setString("SIDE");
     text4.setFillColor(sf::Color::Yellow);      
     text4.setFont(font);  
-    text4.setPosition(137,169);
-    text4.setCharacterSize(19);
+    text4.setPosition(700,600);
+    text4.setCharacterSize(117);
     text4.setStyle(sf::Text::Italic);
 }
 void Menu::draw(sf::RenderWindow& window)

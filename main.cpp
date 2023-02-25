@@ -11,18 +11,16 @@
 #include "set_nickname_menu.h"
 
 using namespace std;
-
 int main ()
 {
-    sf::RenderWindow window(sf::VideoMode(512, 256), "Game");
-    sf::RenderWindow ranking_window(sf::VideoMode(512, 256), "Ranking");
-    // sf::RenderWindow gameover_window(sf::VideoMode(512, 256), "GameOver");
-    sf::RenderWindow menu_window(sf::VideoMode(512, 256), "Menu");
+    sf::RenderWindow window(sf::VideoMode(2048, 1024), "Game");
+    sf::RenderWindow ranking_window(sf::VideoMode(2048, 1024), "Ranking");
+    sf::RenderWindow menu_window(sf::VideoMode(2048, 1024), "Menu");
     Menu menu(menu_window.getSize().x,menu_window.getSize().y);
-    sf::View view(sf::Vector2f(256.f, 128.f), sf::Vector2f(512.f, 256.f));
+    sf::View view(sf::Vector2f(1024.f,512.f), sf::Vector2f(2048.f, 1024.f));
     sf::Vector2f position;
     position.x = 0;
-    position.y = 192;
+    position.y = 768;
 
     sf::Clock clock;
     const float timestep = 1.0/60.0;
@@ -35,14 +33,13 @@ int main ()
     text1.setFont(font);
     text2.setFont(font);
     text3.setFont(font);
-    
     sf::Texture texture;
 	texture.loadFromFile("player.png");
     sf::Sprite sprite;
 	sprite.setTexture(texture);
     sprite.setPosition(position.x,position.y);
     float velocityX = 0, velocityY = 0;
-    float gravity = 0.05;
+    float gravity = 0.15; 
     bool on_ground = 1;
     int column = 64;
     int points = 0;
@@ -53,12 +50,17 @@ int main ()
     sf::String playerInput;
     sf::Text playerText;
     playerText.setFont(font);
+    playerText.setCharacterSize(150);
     playerText.setFillColor(sf::Color::Yellow);  
 
     bool isRankingClosed = false; 
     bool isMenuClosed = false;  
     bool isExitPressed = false;  
-    // bool isBackToMenuPressed = false;  
+
+    //bullet
+    sf::Texture texture1;
+    texture1.loadFromFile("pocisk.png");
+    std::vector<sf::Sprite> bullets;
      
     const int level[] =
     {
@@ -66,19 +68,19 @@ int main ()
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 2, 3, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
     int level2[] =
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
@@ -88,9 +90,9 @@ int main ()
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
     const int menu_background[] =
@@ -109,13 +111,13 @@ int main ()
     TileMap coin;
     TileMap enemy;
     TileMap menu_bg;
-    if (!map.load("set.png", sf::Vector2u(32, 32), level, column, 8))
+    if (!map.load("set.png", sf::Vector2u(128, 128), level, column, 8))
         return -0;
-    if (!coin.load("set2.png", sf::Vector2u(32, 32), level2, column, 8))
+    if (!coin.load("set2.png", sf::Vector2u(128, 128), level2, column, 8))
         return -1;
-    if (!enemy.load("set3.png", sf::Vector2u(32, 32), level3, column, 8))
+    if (!enemy.load("set3.png", sf::Vector2u(128, 128), level3, column, 8))
         return -1;
-    if (!menu_bg.load("background.png", sf::Vector2u(32, 32), menu_background, 16, 8))
+    if (!menu_bg.load("background.png", sf::Vector2u(128, 128), menu_background, 16, 8))
         return -1;
     while (menu_window.isOpen())
     {
@@ -141,8 +143,7 @@ int main ()
                     int x = menu.MenuPressed();
                     if (x == 0)
                     {
-                        // isBackToMenuPressed = false;
-                        sf::RenderWindow nickname_window(sf::VideoMode(512, 256), "Set nickname");
+                        sf::RenderWindow nickname_window(sf::VideoMode(2048, 1024), "Set nickname");
                         Nickname nick_name(nickname_window.getSize().x,nickname_window.getSize().y);
                         while(nickname_window.isOpen())
                         {
@@ -183,22 +184,15 @@ int main ()
                                 }
                                 else if(x2 == 1)
                                 {
-                                    // isBackToMenuPressed = true;
                                     nickname_window.close();
                                     x = 0;
                                     break;
                                 }
-                                // if(isBackToMenuPressed == true)
-                                // {
-                                //     window.create(sf::VideoMode(512, 256), "Game");
-                                //     menu_window.create(sf::VideoMode(512, 256), "Menu");
-                                //     x = 0;
-                                // }
                             }
                         nickname_window.clear();
                         nickname_window.draw(menu_bg);
                         nick_name.draw(nickname_window);
-                        playerText.setPosition(220, 90);
+                        playerText.setPosition(800, 370);
                         nickname_window.draw(playerText);
                         nickname_window.draw(text);
                         nickname_window.display();
@@ -215,9 +209,27 @@ int main ()
                             while (time >= timestep)
                             {
                                 text.setString("Points: " + std::to_string(points));
-                                text.setCharacterSize(15);
+                                text.setCharacterSize(60);
                                 text.setFillColor(sf::Color::Black);
                                 time -= timestep;
+                                for( int i = 0; i < bullets.size(); i++)
+                                {
+                                    bullets[i].setPosition(bullets[i].getPosition().x + 8, bullets[i].getPosition().y);
+                                    if (level3[(int)((bullets[i].getPosition().y)/128) * 64 + (int)((bullets[i].getPosition().x)/128)] == 1)
+                                    {
+                                        level3[(int)((bullets[i].getPosition().y)/128) * 64 + (int)((bullets[i].getPosition().x)/128)] = 0; 
+                                        bullets.clear();
+                                        if (!enemy.load("set3.png", sf::Vector2u(128, 128), level3, column, 8))
+                                            return -1;            
+                                    }
+                                }
+                                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+                                {
+                                    sf::Sprite bullet;
+                                    bullet.setTexture(texture1);
+                                    bullet.setPosition(sprite.getPosition().x + 64, sprite.getPosition().y);
+                                    bullets.push_back(bullet);
+                                }
                                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                                 {
                                     if (position.x <= 0)
@@ -226,11 +238,11 @@ int main ()
                                         velocityX = 0;
                                     }
                                     else
-                                        velocityX = -2;
+                                        velocityX = -4; 
                                 }
                                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
                                 {
-                                    velocityX = 2;
+                                    velocityX = 4; 
                                 }
                                 else
                                 {
@@ -242,62 +254,62 @@ int main ()
                                         velocityY += gravity;
                                     else if (on_ground == 1)
                                     {
-                                        velocityY = -2.0;
+                                        velocityY = -8.0; 
                                         on_ground = 0;
                                     }
                                 }
-                                if (position.y < 192)
+                                if (position.y < 768)
                                 {
                                     velocityY += gravity;
                                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
                                     {
-                                        velocityX = -1.0;
+                                        velocityX = -2.0; 
                                     }
                                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
                                     {
-                                        velocityX = 1.0;
+                                        velocityX = 2.0;
                                     }
                                 }
-                                if (position.y > 192)
+                                if (position.y > 768)
                                 {
                                     velocityX = 0;
                                     velocityY = 0;
-                                    position.y = 192;
+                                    position.y = 768;
                                 }
-                                if (level[(int)(position.y/32) * column + (int)((position.x + 32 + velocityX)/32)] == 2)
+                                if (level[(int)(position.y/128) * column + (int)((position.x + 128 + velocityX)/128)] == 2)
                                 {
                                     velocityX = 0;
                                 }
-                                if (level[(int)(position.y/32) * column + (int)((position.x + velocityX)/32)] == 2)
+                                if (level[(int)(position.y/128) * column + (int)((position.x + velocityX)/128)] == 2)
                                 {
                                     velocityX = 0;
                                 }
-                                if (level[(int)((position.y + 32)/32) * column + (int)((position.x + 32 + velocityX)/32)] == 2)
+                                if (level[(int)((position.y + 128)/128) * column + (int)((position.x + 128 + velocityX)/128)] == 2)
                                 {
                                     velocityX = 0;
                                 }
-                                if (level[(int)((position.y + 32)/32) * column + (int)((position.x + velocityX)/32)] == 2)
+                                if (level[(int)((position.y + 128)/128) * column + (int)((position.x + velocityX)/128)] == 2)
                                 {
                                     velocityX = 0;
                                 }
-                                if ((level[(int)((position.y + 32 + velocityY)/32) * column + (int)((position.x + 32)/32)] == 2) or (level[(int)((position.y + 32 + velocityY)/32) * column + (int)((position.x + 32)/32)] == 0))
+                                if ((level[(int)((position.y + 128 + velocityY)/128) * column + (int)((position.x + 128)/128)] == 2) or (level[(int)((position.y + 128 + velocityY)/128) * column + (int)((position.x + 128)/128)] == 0))
                                 {
                                     velocityY = 0;
                                     on_ground = 1;
                                 }
-                                if (level[(int)((position.y + 32 + velocityY)/32) * column + (int)(position.x/32)] == 2 or (level[(int)((position.y + 32 + velocityY)/32) * column + (int)((position.x)/32)] == 0))
+                                if (level[(int)((position.y + 128 + velocityY)/128) * column + (int)(position.x/128)] == 2 or (level[(int)((position.y + 128 + velocityY)/128) * column + (int)((position.x)/128)] == 0))
                                 {
                                     velocityY = 0;
                                     on_ground = 1; 
                                 } 
-                                if (level2[(int)((position.y + 16 )/32) * column  + (int)((position.x + 16)/32)] == 1)
+                                if (level2[(int)((position.y + 64 )/128) * column  + (int)((position.x + 64)/128)] == 1)
                                 {
-                                    level2[(int)((position.y + 16)/32) * column + (int)((position.x + 16)/32)] = 0;
+                                    level2[(int)((position.y + 64)/128) * column + (int)((position.x + 64)/128)] = 0;
                                     points++;
-                                    if (!coin.load("set2.png", sf::Vector2u(32, 32), level2, column, 8))
+                                    if (!coin.load("set2.png", sf::Vector2u(128, 128), level2, column, 8))
                                         return -1;
                                 }
-                                if (level[(int)((position.y + 40)/32) * column + (int)((position.x)/32)] == 3)
+                                if (level[(int)((position.y + 140)/128) * column + (int)((position.x)/128)] == 3)
                                 {
                                     ifstream file("zapis.txt");
                                     vector<string>nickname;
@@ -345,31 +357,31 @@ int main ()
                                     window.close();
                                 }
                                 //enemy
-                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x)/32)] == 1)
+                                if (level3[(int)((position.y + 128)/128) * column + (int)((position.x)/128)] == 1)
                                 {
-                                    level3[(int)((position.y + 32)/32) * column + (int)((position.x)/32)] = 0;
-                                    if (!enemy.load("set3.png", sf::Vector2u(32, 32), level3, column, 8))
+                                    level3[(int)((position.y + 128)/128) * column + (int)((position.x)/128)] = 0;
+                                    if (!enemy.load("set3.png", sf::Vector2u(128, 128), level3, column, 8))
                                         return -1;
                                 }
-                                if (level3[(int)(position.y/32) * column + (int)((position.x + 32 + velocityX)/32)] == 1)
+                                if (level3[(int)(position.y/128) * column + (int)((position.x + 128 + velocityX)/128)] == 1)
                                 {
                                     velocityX = 0;
                                     if (points > 0)
                                         points--;
                                 }
-                                if (level3[(int)(position.y/32) * column + (int)((position.x + velocityX)/32)] == 1)
+                                if (level3[(int)(position.y/128) * column + (int)((position.x + velocityX)/128)] == 1)
                                 {
                                     velocityX = 0;
                                     if (points > 0)
                                         points--;
                                 }
-                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x + 32 + velocityX)/32)] == 1)
+                                if (level3[(int)((position.y + 128)/128) * column + (int)((position.x + 128 + velocityX)/128)] == 1)
                                 {
                                     velocityX = 0;
                                     if (points > 0)
                                         points--;
                                 }
-                                if (level3[(int)((position.y + 32)/32) * column + (int)((position.x + velocityX)/32)] == 1)
+                                if (level3[(int)((position.y + 128)/128) * column + (int)((position.x + velocityX)/128)] == 1)
                                 {
                                     velocityX = 0;
                                     if (points > 0)
@@ -388,6 +400,10 @@ int main ()
                             window.draw(coin);
                             window.draw(enemy);
                             window.draw(sprite);
+                            for( int i = 0; i < bullets.size(); i++)
+                            {
+                                window.draw(bullets[i]);
+                            }
                             text.setPosition(position.x, 0);
                             window.draw(text);
                             window.display();
@@ -399,27 +415,27 @@ int main ()
                         isMenuClosed = false; 
                         if (isRankingClosed == true)
                         {
-                            ranking_window.create(sf::VideoMode(512, 256), "Ranking");   
+                            ranking_window.create(sf::VideoMode(2048, 1024), "Ranking");   
                         }
                         Ranking ranking(ranking_window.getSize().x,ranking_window.getSize().y);
                         while (ranking_window.isOpen())
                         {
                             text1.setString(top1 + " " + std::to_string(top1_value));
                             text1.setFillColor(sf::Color::Yellow);    
-                            text1.setPosition(180,90);  
-                            text1.setCharacterSize(30);
+                            text1.setPosition(850,400);  
+                            text1.setCharacterSize(100);
                             text1.setStyle(sf::Text::Italic);
 
                             text2.setString(top2 + " " + std::to_string(top2_value));
                             text2.setFillColor(sf::Color::Yellow);      
-                            text2.setPosition(180,130);  
-                            text2.setCharacterSize(30);
+                            text2.setPosition(850,550);  
+                            text2.setCharacterSize(100);
                             text2.setStyle(sf::Text::Italic);
 
                             text3.setString(top3 + " " + std::to_string(top3_value));
                             text3.setFillColor(sf::Color::Yellow);      
-                            text3.setPosition(180,170);  
-                            text3.setCharacterSize(30);
+                            text3.setPosition(850,700);  
+                            text3.setCharacterSize(100);
                             text3.setStyle(sf::Text::Italic);
                             sf::Event event2;
                             while (ranking_window.pollEvent(event2))
@@ -513,8 +529,8 @@ int main ()
                         }
                     if(isMenuClosed == true)
                     {
-                        window.create(sf::VideoMode(512, 256), "Game");
-                        menu_window.create(sf::VideoMode(512, 256), "Menu");
+                        window.create(sf::VideoMode(2048, 1024), "Game");
+                        menu_window.create(sf::VideoMode(2048, 1024), "Menu");
                         x = 0;
                     }
                     }
@@ -532,7 +548,7 @@ int main ()
     menu.draw(menu_window);
     menu_window.display();
     }
-    sf::RenderWindow gameover_window(sf::VideoMode(512, 256), "GameOver");
+    sf::RenderWindow gameover_window(sf::VideoMode(2048, 1024), "GameOver");
     GameOver game_over(gameover_window.getSize().x,gameover_window.getSize().y);
     if(isExitPressed == true)
     {
@@ -546,8 +562,8 @@ int main ()
             text.setString(std::to_string(points));
             text.setFillColor(sf::Color::Yellow);    
             text.setFont(font);  
-            text.setPosition(280,100);  
-            text.setCharacterSize(25);
+            text.setPosition(1200,350);  
+            text.setCharacterSize(150);
             text.setStyle(sf::Text::Italic);
             if (event3.type == sf::Event::Closed)
                 gameover_window.close();
